@@ -3,6 +3,7 @@ package mq
 import (
 	"strconv"
 	"wopi-server/config"
+	"wopi-server/g"
 
 	"github.com/streadway/amqp"
 	"go.uber.org/zap"
@@ -42,6 +43,10 @@ func (p *producer) publishMsg(key string, mandatory, immediate bool, msg amqp.Pu
 //Connect 1. 尝试连接RabbitMQ，建立连接
 // 该连接抽象了套接字连接，并为我们处理协议版本协商和认证等。
 func Connect(config *config.AmpqConfig) {
+	if !config.Enable {
+		g.Log.Warn("ampq消息队列未启用，跳过连接")
+		return
+	}
 	url := "amqp://" + config.Username + ":" + config.Password + "@" + config.Host + ":" + strconv.Itoa(config.Port) + "/"
 	con, err := amqp.Dial(url)
 	failOnError(err, "Failed to connect to RabbitMQ")

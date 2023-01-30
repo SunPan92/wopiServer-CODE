@@ -7,6 +7,7 @@ import (
 	"wopi-server/middleware"
 	"wopi-server/third/cache"
 	"wopi-server/third/db"
+	"wopi-server/third/mq"
 
 	"github.com/kataras/iris/v12"
 	"go.uber.org/zap"
@@ -18,6 +19,8 @@ func main() {
 	config.LoadConfig()
 	//初始化日志
 	middleware.InitLogger(config.Bean.Logger)
+	//连接amqp消息队列
+	mq.Connect(config.Bean.Ampq)
 	//连接数据库
 	db.Mysqldb = db.OpenMysql(config.Bean.Mysql)
 	db.PgDb = db.OpenPg(config.Bean.Postgres)

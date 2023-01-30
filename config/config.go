@@ -16,6 +16,7 @@ var Bean *Config
 // 默认配置文件信息
 var tomlConf = []byte(`
 [ampq]
+enable = false
 host = "10.90.11.108"
 password = "test"
 port = 7256
@@ -93,6 +94,7 @@ type LogConfig struct {
 
 // AmpqConfig mq config entity
 type AmpqConfig struct {
+	Enable   bool
 	Host     string
 	Port     int
 	Username string
