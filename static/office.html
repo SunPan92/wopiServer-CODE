@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>office文档</title>
+    <link rel="stylesheet" href="./style.css">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <script type="text/javascript" src="./jquery-3.5.1.js"></script>
+    <script type="text/javascript">
+        function parseQueryString(url) {
+            var result = {}
+            var str = url.split("?")[1]
+            if (str === undefined) {
+                return result
+            }
+            let items = str.split('&');
+            var arr;
+            for (var i = 0; i < items.length; i++) {
+                arr = items[i].split("=")
+                result[arr[0]] = arr[1]
+            }
+            return result
+        }
+
+        function getContext(uri) {
+            var ctx = ""
+            ctx = uri.split("/")[1];
+            return ctx
+        }
+
+        function onload() {
+            let params = parseQueryString(window.location.href);
+            let accessToken = params["token"];
+            accessToken = accessToken ? accessToken : "";
+            let filepath = params["filepath"];
+            if (!filepath) {
+                alert("请在url输入参数filepath");
+                return
+            }
+            let ctx = getContext(window.location.pathname);
+            $.getJSON("/" + ctx + "/wopi/collaboraUrl?filepath=" + filepath)
+                .done(function (resp) {
+                    let wopiClientUrl = resp['url'];
+                    let wopiSrc = resp['wopiHost'];
+                    let fileId = resp['fileId'];
+                    let wopiUrl = wopiClientUrl + 'WOPISrc=' + wopiSrc + "/" + fileId + "&access_token=" + accessToken;
+                    console.log("wopiUrl", wopiUrl)
+                    document.getElementById("collabora-online-viewer").src = wopiUrl
+                })
+                .fail(function (jqxhr, textStatus, error) {
+                    let errMsg = textStatus + "," + error;
+                    console.log("Request failed: " + errMsg);
+                    alert('Not possible to retrieve the complete Collabora Online url')
+                });
+        }
+    </script>
+</head>
+<body onload="onload()" style="margin: 0;overflow: auto; ">
+<iframe src="" id="collabora-online-viewer"></iframe>
+</body>
+</html>
